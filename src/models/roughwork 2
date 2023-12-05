@@ -1,0 +1,51 @@
+// agent.controller.js
+
+// ... (previous code)
+
+const updateAgent = async (req, res) => {
+  try {
+    const agentId = req.params.id; // Assuming agentId is passed as a route parameter
+    const updates = req.body; // Assuming updates are sent in the request body
+
+    // Find the agent by ID and update the fields
+    const [rowsUpdated, [updatedAgent]] = await Agent.update(updates, {
+      where: { id: agentId },
+      returning: true, // Return the updated agent
+    });
+
+    if (rowsUpdated === 0) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    res.status(200).json({ agent: updatedAgent });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteAgent = async (req, res) => {
+  try {
+    const agentId = req.params.id; // Assuming agentId is passed as a route parameter
+
+    // Find the agent by ID and delete it
+    const rowsDeleted = await Agent.destroy({
+      where: { id: agentId },
+    });
+
+    if (rowsDeleted === 0) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    res.status(204).end(); // 204 No Content for successful deletion
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createAgent,
+  getAgents,
+  updateAgent,
+  deleteAgent,
+  // Other controller methods
+};
